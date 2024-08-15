@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.fsociety.qrcodeapp.ui.theme.QRCodeAppTheme
@@ -51,6 +52,7 @@ fun MainScreen(){
         mutableStateOf("")
     }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(context)
     }
@@ -95,6 +97,16 @@ fun MainScreen(){
                     code = result
                 }
             )
+            try{
+                cameraProviderFuture.get().bindToLifecycle(
+                    lifecycleOwner,
+                    selector,
+                    preview,
+                    imageAnalysis
+                )
+            }catch (e : Exception){
+                e.printStackTrace()
+            }
         })
     }
 }
